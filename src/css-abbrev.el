@@ -9,10 +9,13 @@
   (emmet-parse
    " *\\(\\(?:-\\|\\)[0-9.]+\\)\\(-\\|[A-Za-z]*\\)" 3 "css number arguments"
    (cons (list (elt it 1)
-               (let ((unit (elt it 2)))
-                 (if (= (length unit) 0)
-                     (if (find ?. (elt it 1)) "em" "px")
-                   (gethash unit emmet-css-unit-aliases unit))))
+               (let ((number (elt it 1))
+                     (unit (elt it 2)))
+                 (if (string-equal number "0")
+                     ""
+                   (if (= (length unit) 0)
+                       (if (find ?. number) "em" "px")
+                     (gethash unit emmet-css-unit-aliases unit)))))
          input)))
 
 (emmet-defparameter
