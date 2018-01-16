@@ -4137,12 +4137,10 @@ tbl))
       (progn
         (setq-local emmet-use-rn-css-syntax t)
         (setq-local emmet-use-css-transform t)
-        (setq-local emmet-preview-mode t)
         (message "Emmet React-Native CSS syntax is enabled"))
     (progn
       (setq-local emmet-use-rn-css-syntax nil)
       (setq-local emmet-use-css-transform nil)
-      (setq-local emmet-preview-mode nil)
       (message "Emmet React-Native CSS syntax is disabled"))))
 
 ;;; emmet-mode.el ends here
