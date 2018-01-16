@@ -223,6 +223,25 @@
                (list line))
        "\n"))))
 
+;; Emmet RN CSS syntax tronsform helper functions
+(defun emmet-rn-css-property (property)
+  (replace-regexp-in-string "-" "" (replace-regexp-in-string "-\\([a-z]\\)" #'upcase property)))
+
+(defun emmet-rn-css-value (value)
+  (if (string-equal value "")
+      value
+    (if (string-match "^-?[0-9.]+\\(px\\)?" value)
+        (concat (replace-regexp-in-string "px" "" value) ",")
+      (concat "'" value "',"))))
+
+;; Emmet RN CSS syntax tronsform function
+(defun emmet-rn-css-transform-exprs (declaration)
+  (if (equal ";" (subseq declaration -1))
+      (let ((declaration (split-string (subseq declaration 0 -1) ": ")))
+        (concat (emmet-rn-css-property (car declaration)) ": " (emmet-rn-css-value (cadr declaration))))
+    declaration))
+
+
 (defun emmet-css-transform-exprs (exprs)
   (emmet-join-string
    (mapcar
@@ -269,6 +288,8 @@
 	    ;; remove trailing semicolon while editing Sass files
 	    (if (and emmet-use-sass-syntax (equal ";" (subseq line -1)))
 		(setq line (subseq line 0 -1)))
+            (if emmet-use-rn-css-syntax
+                (setq line (emmet-rn-css-transform-exprs line)))
             (emmet-aif
              (cadr expr)
              (emmet-css-transform-vendor-prefixes line it)
@@ -278,3 +299,19 @@
 
 (defun emmet-css-transform (input)
   (emmet-css-transform-exprs (emmet-css-expr input)))
+
+;; Toggle RN CSS syntax
+(defun emmet-toggle-rn-css-syntax ()
+  "Toggle React-Native CSS syntax"
+  (interactive)
+  (if (equal emmet-use-rn-css-syntax nil)
+      (progn
+        (setq-local emmet-use-rn-css-syntax t)
+        (setq-local emmet-use-css-transform t)
+        (setq-local emmet-preview-mode t)
+        (message "Emmet React-Native CSS syntax is enabled"))
+    (progn
+      (setq-local emmet-use-rn-css-syntax nil)
+      (setq-local emmet-use-css-transform nil)
+      (setq-local emmet-preview-mode nil)
+      (message "Emmet React-Native CSS syntax is disabled"))))

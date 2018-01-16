@@ -82,6 +82,10 @@ NOTE: only \" /\", \"/\" and \"\" are valid."
 e. g. without semicolons")
 (make-variable-buffer-local 'emmet-use-sass-syntax)
 
+(defvar emmet-use-rn-css-syntax nil
+  "When true, uses React Native CSS syntax for CSS abbreviations expanding,")
+(make-variable-buffer-local 'emmet-use-rn-css-syntax)
+
 
 (defvar emmet-css-major-modes
   '(css-mode
