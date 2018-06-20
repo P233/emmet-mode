@@ -444,8 +444,8 @@ See `emmet-preview-online'."
 
 (defun emmet-preview-transformed (indent)
   (let* ((string (buffer-substring-no-properties
-		  (overlay-start emmet-preview-input)
-		  (overlay-end emmet-preview-input))))
+                  (overlay-start emmet-preview-input)
+                  (overlay-end emmet-preview-input))))
     (let ((output (emmet-transform string)))
       (when output
         output))))
@@ -477,30 +477,30 @@ See `emmet-preview-online'."
                    "\\|"))
        (edit-point (format "\\(%s\\)" whole-regex)))
     (if (> count 0)
-	(progn
-	  (forward-char)
-	  (let
-	      ((search-result (re-search-forward edit-point nil t count)))
-	    (if search-result
-		(progn
-		  (cond
-		   ((match-string 2) (goto-char (- (match-end 2) 1)))
-		   ((match-string 3) (end-of-line))
+        (progn
+          (forward-char)
+          (let
+              ((search-result (re-search-forward edit-point nil t count)))
+            (if search-result
+                (progn
+                  (cond
+                   ((match-string 2) (goto-char (- (match-end 2) 1)))
+                   ((match-string 3) (end-of-line))
                    ((match-string 4) (backward-char)))
-		  (point))
-		(backward-char))))
+                  (point))
+                (backward-char))))
       (progn
-	(backward-char)
-	(let
-	    ((search-result (re-search-backward edit-point nil t (- count))))
-	  (if search-result
-	      (progn
-		(cond
-		 ((match-string 2) (goto-char (- (match-end 2) 1)))
-		 ((match-string 3) (end-of-line))
-		 ((match-string 4) (forward-char 2)))
-		(point))
-	      (forward-char)))))))
+        (backward-char)
+        (let
+            ((search-result (re-search-backward edit-point nil t (- count))))
+          (if search-result
+              (progn
+                (cond
+                 ((match-string 2) (goto-char (- (match-end 2) 1)))
+                 ((match-string 3) (end-of-line))
+                 ((match-string 4) (forward-char 2)))
+                (point))
+              (forward-char)))))))
 
 ;;;###autoload
 (defun emmet-wrap-with-markup (wrap-with)
