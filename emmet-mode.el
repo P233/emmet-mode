@@ -5,7 +5,7 @@
 ;; Copyright (C) 2013-     Shin Aoyama        (@smihica      https://github.com/smihica)
 ;; Copyright (C) 2009-2012 Chris Done
 
-;; Version: 1.2.0
+;; Version: 1.2.1
 ;; Author: Shin Aoyama <smihica@gmail.com>
 ;; URL: https://github.com/smihica/emmet-mode
 ;; Last-Updated: 2014-08-11 Mon
@@ -61,13 +61,11 @@
 ;;
 ;; This is a fork of zencoding-mode to support Emmet's feature.
 ;; zencoding-mode (https://github.com/rooney/zencoding)
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Code:
 
-(defconst emmet-mode:version "1.2.0")
+(defconst emmet-mode:version "1.2.1")
 
 (with-no-warnings
   (require 'cl))
@@ -128,14 +126,14 @@
 (defmacro emmet-por (parser1 parser2 then-form &rest else-forms)
   "OR two parsers. Try one parser, if it fails try the next."
   `(emmet-pif (,parser1 input)
-                  (let ((input (cdr it))
-                        (expr (car it)))
-                    ,then-form)
-                  (emmet-pif (,parser2 input)
-                                 (let ((input (cdr it))
-                                       (expr (car it)))
-                                   ,then-form)
-                                 ,@else-forms)))
+              (let ((input (cdr it))
+                    (expr (car it)))
+                ,then-form)
+              (emmet-pif (,parser2 input)
+                         (let ((input (cdr it))
+                               (expr (car it)))
+                           ,then-form)
+                         ,@else-forms)))
 
 (defmacro emmet-find (direction regexp &optional limit-of-search repeat-count)
   "Regexp-search in given direction, returning the position (or nil)
@@ -248,6 +246,13 @@ e. g. without semicolons")
     less-css-mode)
   "Major modes that use emmet for CSS, rather than HTML.")
 
+(defvar emmet-fallback-filter '("html")
+  "Fallback filter for `emmet-default-filter', if none is found.")
+
+(defvar emmet-file-filter nil
+  "File local filter used by `emmet-default-filter'.")
+(make-variable-buffer-local 'emmet-file-filter)
+
 (defun emmet-transform (input)
   (if (or (emmet-detect-style-tag-and-attr) emmet-use-css-transform)
       (emmet-css-transform input)
@@ -309,13 +314,12 @@ For more information see `emmet-mode'."
                 (emmet-reposition-cursor expr))))))))
 
 (defvar emmet-mode-keymap
-  (let
-      ((map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-j") 'emmet-expand-line)
     (define-key map (kbd "<C-return>") 'emmet-expand-line)
     (define-key map (kbd "<C-M-right>") 'emmet-next-edit-point)
     (define-key map (kbd "<C-M-left>") 'emmet-prev-edit-point)
-    (define-key map (kbd "C-c w") 'emmet-wrap-with-markup)
+    (define-key map (kbd "C-c C-c w") 'emmet-wrap-with-markup)
     map)
   "Keymap for emmet minor mode.")
 
@@ -597,8 +601,8 @@ See `emmet-preview-online'."
 
 (defun emmet-preview-transformed (indent)
   (let* ((string (buffer-substring-no-properties
-		  (overlay-start emmet-preview-input)
-		  (overlay-end emmet-preview-input))))
+                  (overlay-start emmet-preview-input)
+                  (overlay-end emmet-preview-input))))
     (let ((output (emmet-transform string)))
       (when output
         output))))
@@ -630,46 +634,61 @@ See `emmet-preview-online'."
                    "\\|"))
        (edit-point (format "\\(%s\\)" whole-regex)))
     (if (> count 0)
-	(progn
-	  (forward-char)
-	  (let
-	      ((search-result (re-search-forward edit-point nil t count)))
-	    (if search-result
-		(progn
-		  (cond
-		   ((match-string 2) (goto-char (- (match-end 2) 1)))
-		   ((match-string 3) (end-of-line))
+        (progn
+          (forward-char)
+          (let
+              ((search-result (re-search-forward edit-point nil t count)))
+            (if search-result
+                (progn
+                  (cond
+                   ((match-string 2) (goto-char (- (match-end 2) 1)))
+                   ((match-string 3) (end-of-line))
                    ((match-string 4) (backward-char)))
-		  (point))
-		(backward-char))))
+                  (point))
+              (backward-char))))
       (progn
-	(backward-char)
-	(let
-	    ((search-result (re-search-backward edit-point nil t (- count))))
-	  (if search-result
-	      (progn
-		(cond
-		 ((match-string 2) (goto-char (- (match-end 2) 1)))
-		 ((match-string 3) (end-of-line))
-		 ((match-string 4) (forward-char 2)))
-		(point))
-	      (forward-char)))))))
+        (backward-char)
+        (let
+            ((search-result (re-search-backward edit-point nil t (- count))))
+          (if search-result
+              (progn
+                (cond
+                 ((match-string 2) (goto-char (- (match-end 2) 1)))
+                 ((match-string 3) (end-of-line))
+                 ((match-string 4) (forward-char 2)))
+                (point))
+            (forward-char)))))))
 
 ;;;###autoload
 (defun emmet-wrap-with-markup (wrap-with)
   "Wrap region with markup."
   (interactive "sExpression to wrap with: ")
   (let* ((multi (string-match "\\*$" wrap-with))
-         (txt (buffer-substring-no-properties (region-beginning) (region-end)))
+         (txt (buffer-substring-no-properties
+               (region-beginning) (region-end)))
          (to-wrap (if multi
                       (split-string txt "\n")
                     (list txt)))
-         (initial-elements (replace-regexp-in-string "\\(.*\\(\\+\\|>\\)\\)?[^>*]+\\*?[[:digit:]]*$" "\\1" wrap-with t))
-         (terminal-element (replace-regexp-in-string "\\(.*>\\)?\\([^>*]+\\)\\(\\*[[:digit:]]+$\\)?\\*?$" "\\2" wrap-with t))
-         (multiplier-expr (replace-regexp-in-string "\\(.*>\\)?\\([^>*]+\\)\\(\\*[[:digit:]]+$\\)?\\*?$" "\\3" wrap-with t))
+         (initial-elements
+          (replace-regexp-in-string
+           "\\(.*\\(\\+\\|>\\)\\)?[^>*]+\\*?[[:digit:]]*$"
+           "\\1" wrap-with t))
+         (terminal-element
+          (replace-regexp-in-string
+           "\\(.*>\\)?\\([^>*]+\\)\\(\\*[[:digit:]]+$\\)?\\*?$"
+           "\\2" wrap-with t))
+         (multiplier-expr
+          (replace-regexp-in-string
+           "\\(.*>\\)?\\([^>*]+\\)\\(\\*[[:digit:]]+$\\)?\\*?$"
+           "\\3" wrap-with t))
          (expr (concat
                 initial-elements
-                (mapconcat (lambda (el) (concat terminal-element "{!!!" (secure-hash 'sha1 el) "!!!}" multiplier-expr))
+                (mapconcat (lambda (el)
+                             (concat terminal-element
+                                     "{!!!"
+                                     (secure-hash 'sha1 el)
+                                     "!!!}"
+                                     multiplier-expr))
                            to-wrap
                            "+")))
          (markup
@@ -684,12 +703,7 @@ See `emmet-preview-online'."
     (when markup
       (delete-region (region-beginning) (region-end))
       (insert markup)
-      (indent-region (region-beginning) (region-end))
-      (let ((end (region-end)))
-        (goto-char (region-beginning))
-        (unless (ignore-errors (progn (emmet-next-edit-point 1) t))
-          (goto-char end)))
-      )))
+      (indent-region (region-beginning) (region-end)))))
 
 ;;;###autoload
 (defun emmet-next-edit-point (count)
@@ -3050,16 +3064,18 @@ tbl))
 
 (defun emmet-default-filter ()
   "Default filter(s) to be used if none is specified."
-  (let* ((file-ext (car (emmet-regex ".*\\(\\..*\\)" (or (buffer-file-name) "") 1)))
-         (defaults '(".html" ("html")
-                     ".htm"  ("html")
-                     ".haml" ("haml")
-                     ".clj"  ("hic")))
-         (default-else      '("html"))
-         (selected-default (member file-ext defaults)))
-    (if selected-default
-        (cadr selected-default)
-      default-else)))
+  (or emmet-file-filter
+      (let* ((file-ext (car (emmet-regex ".*\\(\\..*\\)" (or (buffer-file-name) "") 1)))
+             (defaults '(".html" ("html")
+                         ".htm"  ("html")
+                         ".haml" ("haml")
+                         ".clj"  ("hic")
+                         ".cljs" ("hic")))
+             (default-else emmet-fallback-filter)
+             (selected-default (member file-ext defaults)))
+        (if selected-default
+            (cadr selected-default)
+          default-else))))
 
 (defun emmet-numbering (input)
   (emmet-parse
@@ -3568,7 +3584,7 @@ tbl))
           (self-closing?      (and (not (or tag-txt content))
                                    (or (not tag-has-body?)
                                        (and settings (gethash "selfClosing" settings)))))
-	  (block-indentation? (or content-multiline? (and block-tag? content)))
+          (block-indentation? (or content-multiline? (and block-tag? content)))
           (lf                 (if block-indentation? "\n")))
      (concat "<" tag-name id classes props
              (if self-closing?
@@ -3826,7 +3842,6 @@ tbl))
                 (let ((next (emmet-lorem-generate (- count sl))))
                   (if (string-equal next "") ""
                     (concat " " next))))))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; CSS abbrev:

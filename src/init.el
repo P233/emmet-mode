@@ -2,7 +2,7 @@
 ;;
 ;;; Code:
 
-(defconst emmet-mode:version "1.2.0")
+(defconst emmet-mode:version "1.2.1")
 
 (with-no-warnings
   (require 'cl))
@@ -63,14 +63,14 @@
 (defmacro emmet-por (parser1 parser2 then-form &rest else-forms)
   "OR two parsers. Try one parser, if it fails try the next."
   `(emmet-pif (,parser1 input)
-                  (let ((input (cdr it))
-                        (expr (car it)))
-                    ,then-form)
-                  (emmet-pif (,parser2 input)
-                                 (let ((input (cdr it))
-                                       (expr (car it)))
-                                   ,then-form)
-                                 ,@else-forms)))
+              (let ((input (cdr it))
+                    (expr (car it)))
+                ,then-form)
+              (emmet-pif (,parser2 input)
+                         (let ((input (cdr it))
+                               (expr (car it)))
+                           ,then-form)
+                         ,@else-forms)))
 
 (defmacro emmet-find (direction regexp &optional limit-of-search repeat-count)
   "Regexp-search in given direction, returning the position (or nil)

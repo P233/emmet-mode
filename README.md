@@ -2,6 +2,11 @@ This is a fork of [emmet-mode](https://github.com/smihica/emmet-mode) for person
 
 ## Changelogs
 
+### 1.2.1 (20 June 2018)
+
+* merge upstream [#95](https://github.com/smihica/emmet-mode/pull/95)
+* merge upstream [#102](https://github.com/smihica/emmet-mode/pull/102)
+
 ### 1.2.0
 
 * Updated CSS snippets to the [latest emmet CSS snippets](https://github.com/emmetio/emmet/blob/master/lib/snippets.json).
