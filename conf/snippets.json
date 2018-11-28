@@ -149,8 +149,10 @@
       "pb": "padding-bottom:|;",
       "pl": "padding-left:|;",
       "w": "width:|;",
+      "wf": "width:100%;",
       "wa": "width:auto;",
       "h": "height:|;",
+      "hf": "height:100%;",
       "ha": "height:auto;",
       "maw": "max-width:|;",
       "mawn": "max-width:none;",
@@ -615,18 +617,50 @@
       "wfsma": "-webkit-font-smoothing:antialiased;",
       "wfsms": "-webkit-font-smoothing:subpixel-antialiased;",
       "wfsmsa": "-webkit-font-smoothing:subpixel-antialiased;",
-      "wfsmn": "-webkit-font-smoothing:none;"
+      "wfsmn": "-webkit-font-smoothing:none;",
+
+      "all0": "top: 0;\n\tright: 0;\n\tbottom: 0;\n\tleft: 0;\n\t"
     }
   },
 
   "scss": {
     "snippets": {
-      "@m": "@media ${1:screen}\n\t|\n",
-      "@media": "@media ${1:screen}\n\t|\n",
-      "@f": "@font-face\n\tfont-family:|\n\tsrc:url(|)\n",
-      "@f+": "@font-face\n\tfont-family: '${1:FontName}'\n\tsrc: url('${2:FileName}.eot')\n\tsrc: url('${2:FileName}.eot?#iefix') format('embedded-opentype'), url('${2:FileName}.woff') format('woff'), url('${2:FileName}.ttf') format('truetype'), url('${2:FileName}.svg#${1:FontName}') format('svg')\n\tfont-style: ${3:normal}\n\tfont-weight: ${4:normal}\n",
+      "inc": "@include ",
+      "ext": "@extend ",
+      "mix": "@mixin ",
+      "fun": "@function ",
+      "ret": "@return ",
+      "if": "@if ",
+      "els": "@else ",
+      "eif": "@else if ",
+      "for": "@for ",
+      "each": "@each ",
+      "whi": "@while ",
+      "deb": "@debug ",
+      "war": "@warn ",
+      "atr": "@at-root ",
 
-      "@kf": "@-webkit-keyframes ${1:identifier}\n\t${2:from}\n\t\t${3}${6}\n\t${4:to}\n\t\t${5}\n\n@-o-keyframes ${1:identifier}\n\t${2:from}\n\t\t${3}${6}\n\t${4:to}\n\t\t${5}\n\n@-moz-keyframes ${1:identifier}\n\t${2:from}\n\t\t${3}${6}\n\t${4:to}\n\t\t${5}\n\n@keyframes ${1:identifier}\n\t${2:from}\n\t\t${3}${6}\n\t${4:to}\n\t\t${5}\n"
+      "aca": "&:active ",
+      "afa": "&::after ",
+      "bea": "&::before ",
+      "cha": "&:checked ",
+      "daa": "&:disabled ",
+      "ena": "&:enabled ",
+      "fca": "&:first-child ",
+      "flea": "&::first-letter ",
+      "flia": "&::first-line ",
+      "foca": "&:focus ",
+      "hoa": "&:hover ",
+      "lna": "&:lang(|) ",
+      "lca": "&:last-child ",
+      "lia": "&:link ",
+      "nca": "&:nth-child(|) ",
+      "vita": "&:visited ",
+      "tga": "&:target ",
+      "fota": "&:first-of-type ",
+      "lota": "&:last-of-type ",
+      "nta": "&:nth-of-type(|) ",
+      "nota": "&:not(|) "
     }
   },
 
