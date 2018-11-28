@@ -5,7 +5,7 @@
 ;; Copyright (C) 2013-     Shin Aoyama        (@smihica      https://github.com/smihica)
 ;; Copyright (C) 2009-2012 Chris Done
 
-;; Version: 1.2.1
+;; Version: 1.2.2
 ;; Author: Shin Aoyama <smihica@gmail.com>
 ;; URL: https://github.com/smihica/emmet-mode
 ;; Last-Updated: 2014-08-11 Mon
@@ -65,7 +65,7 @@
 ;;
 ;;; Code:
 
-(defconst emmet-mode:version "1.2.1")
+(defconst emmet-mode:version "1.2.2")
 
 (with-no-warnings
   (require 'cl))
@@ -228,10 +228,10 @@ NOTE: only \" /\", \"/\" and \"\" are valid."
   "When true, transform Emmet snippets into CSS, instead of the usual HTML.")
 (make-variable-buffer-local 'emmet-use-css-transform)
 
-(defvar emmet-use-sass-syntax nil
-  "When true, uses Sass syntax for CSS abbreviations expanding,
+(defvar emmet-use-scss-syntax nil
+  "When true, uses SCSS syntax for CSS abbreviations expanding,
 e. g. without semicolons")
-(make-variable-buffer-local 'emmet-use-sass-syntax)
+(make-variable-buffer-local 'emmet-use-scss-syntax)
 
 (defvar emmet-use-rn-css-syntax nil
   "When true, uses React Native CSS syntax for CSS abbreviations expanding,")
@@ -241,7 +241,6 @@ e. g. without semicolons")
 (defvar emmet-css-major-modes
   '(css-mode
     scss-mode
-    sass-mode
     less-mode
     less-css-mode)
   "Major modes that use emmet for CSS, rather than HTML.")
@@ -316,7 +315,6 @@ For more information see `emmet-mode'."
 (defvar emmet-mode-keymap
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-j") 'emmet-expand-line)
-    (define-key map (kbd "<C-return>") 'emmet-expand-line)
     (define-key map (kbd "<C-M-right>") 'emmet-next-edit-point)
     (define-key map (kbd "<C-M-left>") 'emmet-prev-edit-point)
     (define-key map (kbd "C-c C-c w") 'emmet-wrap-with-markup)
@@ -327,8 +325,8 @@ For more information see `emmet-mode'."
   "Initialize Emmet's buffer-local variables."
   (if (memq major-mode emmet-css-major-modes)
       (setq emmet-use-css-transform t))
-  (if (eq major-mode 'sass-mode)
-      (setq emmet-use-sass-syntax t)))
+  (if (eq major-mode 'scss-mode)
+      (setq emmet-use-scss-syntax t)))
 
 ;;;###autoload
 (define-minor-mode emmet-mode
@@ -439,7 +437,7 @@ See also `emmet-expand-line'."
      (length str))))                             ; ok, just go to the end
 
 (defun emmet-css-next-insert-point (str)
-  (let ((regexp (if emmet-use-sass-syntax ": *\\($\\)" ": *\\(;\\)$")))
+  (let ((regexp (if emmet-use-scss-syntax ": *\\($\\)" ": *\\(;\\)$")))
     (save-match-data
       (set-match-data nil t)
       (string-match regexp str)
@@ -738,6 +736,7 @@ See `emmet-preview-online'."
 (puthash "aife" "align-items:flex-end;" tbl)
 (puthash "aifs" "align-items:flex-start;" tbl)
 (puthash "ais" "align-items:stretch;" tbl)
+(puthash "all0" "top: 0;\n\tright: 0;\n\tbottom: 0;\n\tleft: 0;\n\t" tbl)
 (puthash "anim" "animation:|;" tbl)
 (puthash "animdel" "animation-delay:|;" tbl)
 (puthash "animdir" "animation-direction:|;" tbl)
@@ -1059,6 +1058,7 @@ See `emmet-preview-online'."
 (puthash "fzan" "font-size-adjust:none;" tbl)
 (puthash "h" "height:|;" tbl)
 (puthash "ha" "height:auto;" tbl)
+(puthash "hf" "height:100%;" tbl)
 (puthash "jc" "justify-content:|;" tbl)
 (puthash "jcc" "justify-content:center;" tbl)
 (puthash "jcfe" "justify-content:flex-end;" tbl)
@@ -1284,6 +1284,7 @@ See `emmet-preview-online'."
 (puthash "vv" "visibility:visible;" tbl)
 (puthash "w" "width:|;" tbl)
 (puthash "wa" "width:auto;" tbl)
+(puthash "wf" "width:100%;" tbl)
 (puthash "wfsm" "-webkit-font-smoothing:|;" tbl)
 (puthash "wfsma" "-webkit-font-smoothing:antialiased;" tbl)
 (puthash "wfsmn" "-webkit-font-smoothing:none;" tbl)
@@ -1453,13 +1454,43 @@ tbl) tbl)
 (puthash "cc:noie" "<!--[if !IE]><!-->\n\t${child}\n<!--<![endif]-->" tbl)
 tbl) tbl)
 tbl) tbl)
-(puthash "sass" (let ((tbl (make-hash-table :test 'equal)))
+(puthash "scss" (let ((tbl (make-hash-table :test 'equal)))
 (puthash "snippets" (let ((tbl (make-hash-table :test 'equal)))
-(puthash "@f" "@font-face\n\tfont-family:|\n\tsrc:url(|)\n" tbl)
-(puthash "@f+" "@font-face\n\tfont-family: '${1:FontName}'\n\tsrc: url('${2:FileName}.eot')\n\tsrc: url('${2:FileName}.eot?#iefix') format('embedded-opentype'), url('${2:FileName}.woff') format('woff'), url('${2:FileName}.ttf') format('truetype'), url('${2:FileName}.svg#${1:FontName}') format('svg')\n\tfont-style: ${3:normal}\n\tfont-weight: ${4:normal}\n" tbl)
-(puthash "@kf" "@-webkit-keyframes ${1:identifier}\n\t${2:from}\n\t\t${3}${6}\n\t${4:to}\n\t\t${5}\n\n@-o-keyframes ${1:identifier}\n\t${2:from}\n\t\t${3}${6}\n\t${4:to}\n\t\t${5}\n\n@-moz-keyframes ${1:identifier}\n\t${2:from}\n\t\t${3}${6}\n\t${4:to}\n\t\t${5}\n\n@keyframes ${1:identifier}\n\t${2:from}\n\t\t${3}${6}\n\t${4:to}\n\t\t${5}\n" tbl)
-(puthash "@m" "@media ${1:screen}\n\t|\n" tbl)
-(puthash "@media" "@media ${1:screen}\n\t|\n" tbl)
+(puthash "aca" "&:active " tbl)
+(puthash "afa" "&::after " tbl)
+(puthash "atr" "@at-root " tbl)
+(puthash "bea" "&::before " tbl)
+(puthash "cha" "&:checked " tbl)
+(puthash "daa" "&:disabled " tbl)
+(puthash "deb" "@debug " tbl)
+(puthash "each" "@each " tbl)
+(puthash "eif" "@else if " tbl)
+(puthash "els" "@else " tbl)
+(puthash "ena" "&:enabled " tbl)
+(puthash "ext" "@extend " tbl)
+(puthash "fca" "&:first-child " tbl)
+(puthash "flea" "&::first-letter " tbl)
+(puthash "flia" "&::first-line " tbl)
+(puthash "foca" "&:focus " tbl)
+(puthash "for" "@for " tbl)
+(puthash "fota" "&:first-of-type " tbl)
+(puthash "fun" "@function " tbl)
+(puthash "hoa" "&:hover " tbl)
+(puthash "if" "@if " tbl)
+(puthash "inc" "@include " tbl)
+(puthash "lca" "&:last-child " tbl)
+(puthash "lia" "&:link " tbl)
+(puthash "lna" "&:lang(|) " tbl)
+(puthash "lota" "&:last-of-type " tbl)
+(puthash "mix" "@mixin " tbl)
+(puthash "nca" "&:nth-child(|) " tbl)
+(puthash "nota" "&:not(|) " tbl)
+(puthash "nta" "&:nth-of-type(|) " tbl)
+(puthash "ret" "@return " tbl)
+(puthash "tga" "&:target " tbl)
+(puthash "vita" "&:visited " tbl)
+(puthash "war" "@warn " tbl)
+(puthash "whi" "@while " tbl)
 tbl) tbl)
 tbl) tbl)
 tbl))
@@ -3993,8 +4024,8 @@ tbl))
  (gethash "snippets" (gethash "css" emmet-snippets)))
 
 (emmet-defparameter
- emmet-sass-snippets
- (gethash "snippets" (gethash "sass" emmet-snippets)))
+ emmet-scss-snippets
+ (gethash "snippets" (gethash "scss" emmet-snippets)))
 
 (emmet-defparameter
  emmet-css-unitless-properties
@@ -4091,7 +4122,7 @@ tbl))
    (mapcar
     #'(lambda (expr)
         (let*
-            ((hash-map (if emmet-use-sass-syntax emmet-sass-snippets emmet-css-snippets))
+            ((hash-map (if emmet-use-scss-syntax emmet-scss-snippets emmet-css-snippets))
              (basement
               (emmet-aif
                (or (gethash (car expr) hash-map) (gethash (car expr) emmet-css-snippets))
@@ -4129,9 +4160,6 @@ tbl))
                  (if (caddr expr)
                      (concat (subseq basement 0 -1) " !important;")
                    basement)))
-            ;; remove trailing semicolon while editing Sass files
-            (if (and emmet-use-sass-syntax (equal ";" (subseq line -1)))
-                (setq line (subseq line 0 -1)))
             (if emmet-use-rn-css-syntax
                 (setq line (emmet-rn-css-transform-exprs line)))
             (emmet-aif

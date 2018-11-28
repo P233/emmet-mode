@@ -2,6 +2,12 @@ This is a fork of [emmet-mode](https://github.com/smihica/emmet-mode) for person
 
 ## Changelogs
 
+### 1.2.2 (28 Nov 2018)
+
+* Removed Sass syntax support, and replaced with SCSS syntax support
+* Updated CSS snippets, and added SCSS snippets (strong opinionated)
+* Removed preferences.el and snippets.el two generated files from repo
+
 ### 1.2.1 (20 June 2018)
 
 * merge upstream [#95](https://github.com/smihica/emmet-mode/pull/95)
