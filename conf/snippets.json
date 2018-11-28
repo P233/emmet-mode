@@ -619,7 +619,7 @@
     }
   },
 
-  "sass": {
+  "scss": {
     "snippets": {
       "@m": "@media ${1:screen}\n\t|\n",
       "@media": "@media ${1:screen}\n\t|\n",

@@ -77,10 +77,10 @@ NOTE: only \" /\", \"/\" and \"\" are valid."
   "When true, transform Emmet snippets into CSS, instead of the usual HTML.")
 (make-variable-buffer-local 'emmet-use-css-transform)
 
-(defvar emmet-use-sass-syntax nil
-  "When true, uses Sass syntax for CSS abbreviations expanding,
+(defvar emmet-use-scss-syntax nil
+  "When true, uses SCSS syntax for CSS abbreviations expanding,
 e. g. without semicolons")
-(make-variable-buffer-local 'emmet-use-sass-syntax)
+(make-variable-buffer-local 'emmet-use-scss-syntax)
 
 (defvar emmet-use-rn-css-syntax nil
   "When true, uses React Native CSS syntax for CSS abbreviations expanding,")
@@ -90,7 +90,6 @@ e. g. without semicolons")
 (defvar emmet-css-major-modes
   '(css-mode
     scss-mode
-    sass-mode
     less-mode
     less-css-mode)
   "Major modes that use emmet for CSS, rather than HTML.")
@@ -165,7 +164,6 @@ For more information see `emmet-mode'."
 (defvar emmet-mode-keymap
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-j") 'emmet-expand-line)
-    (define-key map (kbd "<C-return>") 'emmet-expand-line)
     (define-key map (kbd "<C-M-right>") 'emmet-next-edit-point)
     (define-key map (kbd "<C-M-left>") 'emmet-prev-edit-point)
     (define-key map (kbd "C-c C-c w") 'emmet-wrap-with-markup)
@@ -176,8 +174,8 @@ For more information see `emmet-mode'."
   "Initialize Emmet's buffer-local variables."
   (if (memq major-mode emmet-css-major-modes)
       (setq emmet-use-css-transform t))
-  (if (eq major-mode 'sass-mode)
-      (setq emmet-use-sass-syntax t)))
+  (if (eq major-mode 'scss-mode)
+      (setq emmet-use-scss-syntax t)))
 
 ;;;###autoload
 (define-minor-mode emmet-mode
@@ -288,7 +286,7 @@ See also `emmet-expand-line'."
      (length str))))                             ; ok, just go to the end
 
 (defun emmet-css-next-insert-point (str)
-  (let ((regexp (if emmet-use-sass-syntax ": *\\($\\)" ": *\\(;\\)$")))
+  (let ((regexp (if emmet-use-scss-syntax ": *\\($\\)" ": *\\(;\\)$")))
     (save-match-data
       (set-match-data nil t)
       (string-match regexp str)

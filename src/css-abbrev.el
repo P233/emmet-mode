@@ -149,8 +149,8 @@
  (gethash "snippets" (gethash "css" emmet-snippets)))
 
 (emmet-defparameter
- emmet-sass-snippets
- (gethash "snippets" (gethash "sass" emmet-snippets)))
+ emmet-scss-snippets
+ (gethash "snippets" (gethash "scss" emmet-snippets)))
 
 (emmet-defparameter
  emmet-css-unitless-properties
@@ -247,7 +247,7 @@
    (mapcar
     #'(lambda (expr)
         (let*
-            ((hash-map (if emmet-use-sass-syntax emmet-sass-snippets emmet-css-snippets))
+            ((hash-map (if emmet-use-scss-syntax emmet-scss-snippets emmet-css-snippets))
              (basement
               (emmet-aif
                (or (gethash (car expr) hash-map) (gethash (car expr) emmet-css-snippets))
@@ -285,9 +285,6 @@
                  (if (caddr expr)
                      (concat (subseq basement 0 -1) " !important;")
                    basement)))
-            ;; remove trailing semicolon while editing Sass files
-            (if (and emmet-use-sass-syntax (equal ";" (subseq line -1)))
-                (setq line (subseq line 0 -1)))
             (if emmet-use-rn-css-syntax
                 (setq line (emmet-rn-css-transform-exprs line)))
             (emmet-aif
