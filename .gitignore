@@ -1,2 +1,4 @@
 memo*
 *.elc
+./src/snippets.el
+./src/preferences.el
