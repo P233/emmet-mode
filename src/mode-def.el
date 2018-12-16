@@ -286,7 +286,7 @@ See also `emmet-expand-line'."
      (length str))))                             ; ok, just go to the end
 
 (defun emmet-css-next-insert-point (str)
-  (let ((regexp (if emmet-use-scss-syntax ": *\\($\\)" ": *\\(;\\)$")))
+  (let ((regexp "\\(\\()\\)\\|\\(;\\)$\\|\\(\n\s*}\\)\\)"))
     (save-match-data
       (set-match-data nil t)
       (string-match regexp str)
