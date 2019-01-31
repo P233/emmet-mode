@@ -224,10 +224,10 @@
        "\n"))))
 
 ;; Emmet RN CSS syntax transform helper functions
-(defun emmet-rn-css-property (property)
+(defun emmet-jss-property (property)
   (replace-regexp-in-string "-" "" (replace-regexp-in-string "-\\([a-z]\\)" #'upcase property)))
 
-(defun emmet-rn-css-value (value)
+(defun emmet-jss-value (value)
   (if (string-equal value "")
       value
     (if (string-match "^-?[0-9.]+\\(px\\)?" value)
@@ -235,10 +235,10 @@
       (concat "'" value "',"))))
 
 ;; Emmet RN CSS syntax transform function
-(defun emmet-rn-css-transform-exprs (declaration)
+(defun emmet-jss-transform-exprs (declaration)
   (if (equal ";" (subseq declaration -1))
       (let ((declaration (split-string (subseq declaration 0 -1) ": ")))
-        (concat (emmet-rn-css-property (car declaration)) ": " (emmet-rn-css-value (cadr declaration))))
+        (concat (emmet-jss-property (car declaration)) ": " (emmet-jss-value (cadr declaration))))
     declaration))
 
 
@@ -285,8 +285,8 @@
                  (if (caddr expr)
                      (concat (subseq basement 0 -1) " !important;")
                    basement)))
-            (if emmet-use-rn-css-syntax
-                (setq line (emmet-rn-css-transform-exprs line)))
+            (if emmet-use-jss-syntax
+                (setq line (emmet-jss-transform-exprs line)))
             (emmet-aif
              (cadr expr)
              (emmet-css-transform-vendor-prefixes line it)
@@ -298,15 +298,15 @@
   (emmet-css-transform-exprs (emmet-css-expr input)))
 
 ;; Toggle RN CSS syntax
-(defun emmet-toggle-rn-css-syntax ()
-  "Toggle React-Native CSS syntax"
+(defun emmet-toggle-jss-syntax ()
+  "Toggle JSS syntax"
   (interactive)
-  (if (equal emmet-use-rn-css-syntax nil)
+  (if (equal emmet-use-jss-syntax nil)
       (progn
-        (setq-local emmet-use-rn-css-syntax t)
+        (setq-local emmet-use-jss-syntax t)
         (setq-local emmet-use-css-transform t)
-        (message "Emmet React-Native CSS syntax is enabled"))
+        (message "Emmet JSS syntax is enabled"))
     (progn
-      (setq-local emmet-use-rn-css-syntax nil)
+      (setq-local emmet-use-jss-syntax nil)
       (setq-local emmet-use-css-transform nil)
-      (message "Emmet React-Native CSS syntax is disabled"))))
+      (message "Emmet JSS syntax is disabled"))))
