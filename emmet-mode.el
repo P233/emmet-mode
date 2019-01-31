@@ -5,7 +5,7 @@
 ;; Copyright (C) 2013-     Shin Aoyama        (@smihica      https://github.com/smihica)
 ;; Copyright (C) 2009-2012 Chris Done
 
-;; Version: 1.2.2
+;; Version: 1.2.3
 ;; Author: Shin Aoyama <smihica@gmail.com>
 ;; URL: https://github.com/smihica/emmet-mode
 ;; Last-Updated: 2014-08-11 Mon
@@ -65,7 +65,7 @@
 ;;
 ;;; Code:
 
-(defconst emmet-mode:version "1.2.2")
+(defconst emmet-mode:version "1.2.3")
 
 (with-no-warnings
   (require 'cl))
@@ -233,9 +233,9 @@ NOTE: only \" /\", \"/\" and \"\" are valid."
 e. g. without semicolons")
 (make-variable-buffer-local 'emmet-use-scss-syntax)
 
-(defvar emmet-use-rn-css-syntax nil
-  "When true, uses React Native CSS syntax for CSS abbreviations expanding,")
-(make-variable-buffer-local 'emmet-use-rn-css-syntax)
+(defvar emmet-use-jss-syntax nil
+  "When true, uses JSS syntax for CSS abbreviations expanding,")
+(make-variable-buffer-local 'emmet-use-jss-syntax)
 
 
 (defvar emmet-css-major-modes
@@ -437,11 +437,13 @@ See also `emmet-expand-line'."
      (length str))))                             ; ok, just go to the end
 
 (defun emmet-css-next-insert-point (str)
-  (let ((regexp (if emmet-use-scss-syntax ": *\\($\\)" ": *\\(;\\)$")))
+  (let ((regexp "\\(()\\|\s;$\\|{\n[\s\t]*\n\\)"))
     (save-match-data
       (set-match-data nil t)
       (string-match regexp str)
-      (or (match-beginning 1) (length str)))))
+      (if (match-end 1)
+          (- (match-end 1) 1)
+        (length str)))))
 
 (defvar emmet-flash-ovl nil)
 (make-variable-buffer-local 'emmet-flash-ovl)
@@ -736,7 +738,6 @@ See `emmet-preview-online'."
 (puthash "aife" "align-items:flex-end;" tbl)
 (puthash "aifs" "align-items:flex-start;" tbl)
 (puthash "ais" "align-items:stretch;" tbl)
-(puthash "all0" "top: 0;\n\tright: 0;\n\tbottom: 0;\n\tleft: 0;\n\t" tbl)
 (puthash "anim" "animation:|;" tbl)
 (puthash "animdel" "animation-delay:|;" tbl)
 (puthash "animdir" "animation-direction:|;" tbl)
@@ -1456,40 +1457,40 @@ tbl) tbl)
 tbl) tbl)
 (puthash "scss" (let ((tbl (make-hash-table :test 'equal)))
 (puthash "snippets" (let ((tbl (make-hash-table :test 'equal)))
-(puthash "aca" "&:active " tbl)
-(puthash "afa" "&::after " tbl)
-(puthash "atr" "@at-root " tbl)
-(puthash "bea" "&::before " tbl)
-(puthash "cha" "&:checked " tbl)
-(puthash "daa" "&:disabled " tbl)
-(puthash "deb" "@debug " tbl)
+(puthash "aca" "&:active {\n\t|\n}" tbl)
+(puthash "afa" "&::after {\n\t|\n}" tbl)
+(puthash "atr" "@at-root {\n\t|\n}" tbl)
+(puthash "bea" "&::before {\n\t|\n}" tbl)
+(puthash "cha" "&:checked {\n\t|\n}" tbl)
+(puthash "daa" "&:disabled {\n\t|\n}" tbl)
+(puthash "deb" "@debug |;" tbl)
 (puthash "each" "@each " tbl)
 (puthash "eif" "@else if " tbl)
 (puthash "els" "@else " tbl)
-(puthash "ena" "&:enabled " tbl)
-(puthash "ext" "@extend " tbl)
-(puthash "fca" "&:first-child " tbl)
-(puthash "flea" "&::first-letter " tbl)
-(puthash "flia" "&::first-line " tbl)
-(puthash "foca" "&:focus " tbl)
+(puthash "ena" "&:enabled {\n\t|\n}" tbl)
+(puthash "ext" "@extend |;" tbl)
+(puthash "fca" "&:first-child {\n\t|\n}" tbl)
+(puthash "flea" "&::first-letter {\n\t|\n}" tbl)
+(puthash "flia" "&::first-line {\n\t|\n}" tbl)
+(puthash "foca" "&:focus {\n\t|\n}" tbl)
 (puthash "for" "@for " tbl)
-(puthash "fota" "&:first-of-type " tbl)
+(puthash "fota" "&:first-of-type {\n\t|\n}" tbl)
 (puthash "fun" "@function " tbl)
-(puthash "hoa" "&:hover " tbl)
+(puthash "hoa" "&:hover {\n\t|\n}" tbl)
 (puthash "if" "@if " tbl)
-(puthash "inc" "@include " tbl)
-(puthash "lca" "&:last-child " tbl)
-(puthash "lia" "&:link " tbl)
-(puthash "lna" "&:lang(|) " tbl)
-(puthash "lota" "&:last-of-type " tbl)
+(puthash "inc" "@include |;" tbl)
+(puthash "lca" "&:last-child {\n\t|\n}" tbl)
+(puthash "lia" "&:link {\n\t|\n}" tbl)
+(puthash "lna" "&:lang(|) {\n\t\n}" tbl)
+(puthash "lota" "&:last-of-type {\n\t|\n}" tbl)
 (puthash "mix" "@mixin " tbl)
-(puthash "nca" "&:nth-child(|) " tbl)
-(puthash "nota" "&:not(|) " tbl)
-(puthash "nta" "&:nth-of-type(|) " tbl)
-(puthash "ret" "@return " tbl)
-(puthash "tga" "&:target " tbl)
-(puthash "vita" "&:visited " tbl)
-(puthash "war" "@warn " tbl)
+(puthash "nca" "&:nth-child(|) {\n\t\n}" tbl)
+(puthash "nota" "&:not(|) {\n\t\n}" tbl)
+(puthash "nta" "&:nth-of-type(|) {\n\t\n}" tbl)
+(puthash "ret" "@return |;" tbl)
+(puthash "tga" "&:target {\n\t|\n}" tbl)
+(puthash "vita" "&:visited {\n\t|\n}" tbl)
+(puthash "war" "@warn |;" tbl)
 (puthash "whi" "@while " tbl)
 tbl) tbl)
 tbl) tbl)
@@ -4099,10 +4100,10 @@ tbl))
        "\n"))))
 
 ;; Emmet RN CSS syntax transform helper functions
-(defun emmet-rn-css-property (property)
+(defun emmet-jss-property (property)
   (replace-regexp-in-string "-" "" (replace-regexp-in-string "-\\([a-z]\\)" #'upcase property)))
 
-(defun emmet-rn-css-value (value)
+(defun emmet-jss-value (value)
   (if (string-equal value "")
       value
     (if (string-match "^-?[0-9.]+\\(px\\)?" value)
@@ -4110,10 +4111,10 @@ tbl))
       (concat "'" value "',"))))
 
 ;; Emmet RN CSS syntax transform function
-(defun emmet-rn-css-transform-exprs (declaration)
+(defun emmet-jss-transform-exprs (declaration)
   (if (equal ";" (subseq declaration -1))
       (let ((declaration (split-string (subseq declaration 0 -1) ": ")))
-        (concat (emmet-rn-css-property (car declaration)) ": " (emmet-rn-css-value (cadr declaration))))
+        (concat (emmet-jss-property (car declaration)) ": " (emmet-jss-value (cadr declaration))))
     declaration))
 
 
@@ -4160,8 +4161,8 @@ tbl))
                  (if (caddr expr)
                      (concat (subseq basement 0 -1) " !important;")
                    basement)))
-            (if emmet-use-rn-css-syntax
-                (setq line (emmet-rn-css-transform-exprs line)))
+            (if emmet-use-jss-syntax
+                (setq line (emmet-jss-transform-exprs line)))
             (emmet-aif
              (cadr expr)
              (emmet-css-transform-vendor-prefixes line it)
@@ -4173,17 +4174,17 @@ tbl))
   (emmet-css-transform-exprs (emmet-css-expr input)))
 
 ;; Toggle RN CSS syntax
-(defun emmet-toggle-rn-css-syntax ()
-  "Toggle React-Native CSS syntax"
+(defun emmet-toggle-jss-syntax ()
+  "Toggle JSS syntax"
   (interactive)
-  (if (equal emmet-use-rn-css-syntax nil)
+  (if (equal emmet-use-jss-syntax nil)
       (progn
-        (setq-local emmet-use-rn-css-syntax t)
+        (setq-local emmet-use-jss-syntax t)
         (setq-local emmet-use-css-transform t)
-        (message "Emmet React-Native CSS syntax is enabled"))
+        (message "Emmet JSS syntax is enabled"))
     (progn
-      (setq-local emmet-use-rn-css-syntax nil)
+      (setq-local emmet-use-jss-syntax nil)
       (setq-local emmet-use-css-transform nil)
-      (message "Emmet React-Native CSS syntax is disabled"))))
+      (message "Emmet JSS syntax is disabled"))))
 
 ;;; emmet-mode.el ends here
